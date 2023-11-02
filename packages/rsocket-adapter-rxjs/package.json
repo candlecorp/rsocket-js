@@ -1,6 +1,6 @@
 {
   "name": "@candlecorp/rsocket-adapter-rxjs",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "license": "Apache-2.0",
   "main": "./dist/commonjs/index.js",
   "types": "./dist/commonjs/index.d.ts",
@@ -12,12 +12,14 @@
   "publishConfig": {
     "access": "public"
   },
-  "engines": {"node": ">=19.0.0"},
+  "engines": {
+    "node": ">=19.0.0"
+  },
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "rimraf -rf ./dist",
-    "compile": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "npm run build",
+    "compile": "tshy",
+    "prepublishOnly": "tshy",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "dependencies": {
