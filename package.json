@@ -3,9 +3,9 @@
   "description": "A JavaScript implementation of the RSocket protocol (https://github.com/rsocket/rsocket).",
   "private": true,
   "license": "Apache-2.0",
-  "workspaces": [
-    "packages/*"
-  ],
+  // "workspaces": [
+  //   "packages/*"
+  // ],
   "scripts": {
     "build": "lerna run build",
     "clean": "lerna run clean && rimraf -rf ./coverage",

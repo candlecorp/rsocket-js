@@ -2,10 +2,5 @@
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "rsocket-*": [
-        "packages/rsocket-*/src"
-      ]
-    }
   }
 }

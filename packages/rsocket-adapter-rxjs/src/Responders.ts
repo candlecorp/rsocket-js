@@ -27,9 +27,9 @@ import {
 } from "rsocket-core";
 import { Codec } from "rsocket-messaging";
 import { asyncScheduler, Observable, SchedulerLike } from "rxjs";
-import ObserverToBufferingRSocketSubscriber from "./ObserverToBufferingRSocketSubscriber";
-import ObserverToRSocketSubscriber from "./ObserverToRSocketSubscriber";
-import RSocketPublisher2PrefetchingObservableToObserver2BufferingRSocketSubscriber from "./RSocketPublisher2PrefetchingObservableToObserver2BufferingRSocketSubscriber";
+import ObserverToBufferingRSocketSubscriber from "./ObserverToBufferingRSocketSubscriber.js";
+import ObserverToRSocketSubscriber from "./ObserverToRSocketSubscriber.js";
+import RSocketPublisher2PrefetchingObservableToObserver2BufferingRSocketSubscriber from "./RSocketPublisher2PrefetchingObservableToObserver2BufferingRSocketSubscriber.js";
 
 export function fireAndForget<IN>(
   handler: (data: IN) => Observable<void>,
