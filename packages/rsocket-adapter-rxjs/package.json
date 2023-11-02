@@ -12,6 +12,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {"node": ">=19.0.0"},
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "rimraf -rf ./dist",
