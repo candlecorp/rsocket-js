@@ -25,6 +25,7 @@ import {
   OnExtensionSubscriber,
   OnNextSubscriber,
   OnTerminalSubscriber,
+  Payload,
   Requestable,
   RSocket,
 } from "rsocket-core";
@@ -38,10 +39,12 @@ import {
   SchedulerLike,
   Subject,
   take,
+  map,
 } from "rxjs";
 import Observer2BufferingSubscriberToPublisher2PrefetchingObservable from "./Observer2BufferingSubscriberToPublisher2PrefetchingObservable";
 import RSocketPublisherToObservable from "./RSocketPublisherToObservable";
 import RSocketPublisherToPrefetchingObservable from "./RSocketPublisherToPrefetchingObservable";
+import Observer2BufferingSubscriberToPublisher2PrefetchingObservableRaw from "./Observer2BufferingSubscriberToPublisher2PrefetchingObservableRaw";
 
 export function fireAndForget<TData>(
   data: TData,
@@ -186,6 +189,59 @@ export function requestChannel<TData, RData>(
           outputCodec,
           scheduler
         ) as Observable<RData>;
+      })
+    );
+  };
+}
+
+export function requestChannelRaw(
+  datas: Observable<Payload>,
+  prefetch: number = 256,
+  scheduler: SchedulerLike = asyncScheduler
+): (
+  rsocket: RSocket,
+  metadata?: Map<string | number | WellKnownMimeType, Buffer>
+) => Observable<Payload> {
+  let once = false;
+  const [firstValueObservable, restValuesObservable] = partition(
+    datas.pipe(
+      share({
+        connector: () => new Subject(),
+        resetOnRefCountZero: true,
+      })
+    ),
+    (_value) => {
+      const previous = once;
+      if (!previous) {
+        once = true;
+      }
+
+      return !previous;
+    }
+  );
+
+  return (
+    rsocket: RSocket,
+    metadata?: Map<string | number | WellKnownMimeType, Buffer>
+  ) => {
+    const encodedMetadata = metadata ? encodeCompositeMetadata(metadata) : null;
+    return firstValueObservable.pipe(
+      take(1),
+      concatMap((firstValue) => {
+        return new Observer2BufferingSubscriberToPublisher2PrefetchingObservableRaw(
+          (
+            s: OnTerminalSubscriber &
+              OnNextSubscriber &
+              OnExtensionSubscriber &
+              Requestable &
+              Cancellable
+          ) => {
+            return rsocket.requestChannel(firstValue, prefetch, false, s);
+          },
+          prefetch,
+          restValuesObservable,
+          scheduler
+        ) as Observable<Payload>;
       })
     );
   };

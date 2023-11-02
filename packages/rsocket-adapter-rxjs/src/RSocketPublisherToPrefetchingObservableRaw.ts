@@ -32,11 +32,10 @@ import {
   Unsubscribable,
 } from "rxjs";
 
-export default class RSocketPublisherToPrefetchingObservable<
-    T,
+export default class RSocketPublisherToPrefetchingObservableRaw<
     TSignalSender extends Requestable & Cancellable & OnExtensionSubscriber
   >
-  extends Observable<T>
+  extends Observable<Payload>
   implements
     OnTerminalSubscriber,
     OnNextSubscriber,
@@ -44,7 +43,7 @@ export default class RSocketPublisherToPrefetchingObservable<
     Unsubscribable
 {
   private readonly limit;
-  private observer: Subscriber<T>;
+  private observer: Subscriber<Payload>;
   protected subscriber: TSignalSender;
 
   private received: number = 0;
@@ -57,7 +56,6 @@ export default class RSocketPublisherToPrefetchingObservable<
       n: number
     ) => TSignalSender,
     protected readonly prefetch: number,
-    private readonly responseCodec?: Codec<T>,
     protected readonly scheduler: SchedulerLike = asyncScheduler
   ) {
     super();
@@ -67,7 +65,7 @@ export default class RSocketPublisherToPrefetchingObservable<
 
   onNext(payload: Payload, isComplete: boolean): void {
     this.received++;
-    this.observer.next(this.responseCodec.decode(payload.data));
+    this.observer.next(payload);
 
     if (isComplete) {
       this.observer.complete();
